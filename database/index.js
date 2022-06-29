@@ -20,17 +20,16 @@ let repoSchema = new mongoose.Schema({
   url: String,
   owner: String,
   avatar_url: String,
+  forks: Number
 });
 
 let Repo = mongoose.model('Repo', repoSchema);
 
 let retrieve = (callback) => {
-  console.log('retreiving from DB');
   Repo.find({}, (err, docs) => {
     if (err) {
       callback(err, null);
     } else {
-      console.log(docs);
       callback(null, docs);
     }
   })
@@ -44,20 +43,19 @@ let save = (repoList, callback) => {
    //stores the repos in the database
    Repo.find({}, (err, docs) => {
     if (err) {
-      throw err;
+      callback(err, null);
     } else {
+      //check for duplicates using names, filter them out of the retrieved list
       var names = docs.map((doc) => (doc.name));
       var noDups = repoList.filter((repo) => (names.includes(repo.name) === false));
-
+      //insert these non-duplicates into the database
       Repo.insertMany(noDups, (err, result) => {
         if (err) {
-          console.log(err);
+          callback(err, null);
         } else {
           callback(null, repoList);
         }
        });
-
-
     }
    })
 

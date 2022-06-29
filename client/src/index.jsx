@@ -18,7 +18,11 @@ class App extends React.Component {
   componentDidMount() {
     //Callback passed to GET request, set state with repos
     var mountSuccessCB = (data) => {
-      data = data.slice(0, 25);
+      if (data.length > 25) {
+        var rand = Math.floor(Math.random() * 10);
+        data = data.filter((repo, ind) => (ind % rand === 0));
+        data = data.slice(0, 25);
+      }
       this.setState({repos: data});
     }
     //local GET request to /repos path, expecting JSON response
@@ -28,12 +32,15 @@ class App extends React.Component {
     )
   };
 
-  //Originates from Search component,
-  //1 - performs post request (posting )
+  //Generates API Github Request (from search comp)
   search (term) {
     //callback- when response from server occurs, sets state
     var successcb = (result) => {
+      //adds results to the top of a state copy, then sets state with 25 repos
       var copy = this.state.repos.slice();
+      copy.sort((a, b) => (b.forks - a.forks));
+      // var rand = Math.floor(Math.random() * 10);
+      // copy = copy.filter((repo, ind) => (ind % rand === 0));
       result.forEach((res) => {
         copy.unshift(res);
       })

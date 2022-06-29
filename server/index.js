@@ -19,7 +19,8 @@ app.post('/repos',  function (req, res) {
           description: repo.description,
           url: repo['html_url'],
           avatar: repo.owner['avatar_url'],
-          owner: repo.owner.login
+          owner: repo.owner.login,
+          forks: repo.forks
         }));
         save(repos, callback);
       }
@@ -33,6 +34,7 @@ app.post('/repos',  function (req, res) {
   req.on('end', () => {
     postCallback(incoming.slice(5), (err, result) => {
       if (err) {
+        console.log(err);
         res.writeHead(404);
         res.end('ERROR, no repos recieved from DB');
       } else {
